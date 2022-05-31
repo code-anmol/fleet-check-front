@@ -1,4 +1,3 @@
-import "./App.css";
 import { Navbar } from "./components/Navbar";
 import { VehicleList } from "./components/VehicleList";
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';

@@ -15,7 +15,7 @@ export const InspectionForm = () => {
           params: { vehicleID: vehicleID },
         });
         setInspectionForm(response.data);
-        console.log(response.data)
+        console.log(response.data);
       } catch (e) {
         console.log(e);
       }
@@ -31,8 +31,11 @@ export const InspectionForm = () => {
       vehicleNumber: "",
     },
     {
-      inspectionDtoList: [],
+      isPreOrPost: "",
     },
+    {
+      inspectionResults: [],
+    }
   );
 
   const handleChange = (e) => {
@@ -40,49 +43,66 @@ export const InspectionForm = () => {
     setInspectionForm({ ...inspectionForm, [e.target.name]: value });
   };
   const handleListChange = (e) => {
-    const list = inspectionForm.inspectionDtoList;
-    
-
+    const list = inspectionForm.inspectionResults;
 
     list.map((item) => {
-      if(item.inspectionName === e.target.name){
-        
+      if (item.inspectionName === e.target.name) {
         item.result = e.target.value;
       }
-    })
+    });
 
-    setInspectionForm({...inspectionForm,[inspectionForm.inspectionDtoList]:list})
+    setInspectionForm({
+      ...inspectionForm,
+      [inspectionForm.inspectionResults]: list,
+    });
   };
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = (e) => {
     e.preventDefault();
     const inspectionFormResult = {
-      inspectionDtoList: inspectionForm.inspectionDtoList,
-      operatorTagNumber:inspectionForm.operatorTagNumber,
-      vehicleNumber:inspectionForm.vehicleNumber
-
+      inspectionResults: inspectionForm.inspectionResults,
+      operatorTagNumber: inspectionForm.operatorTagNumber,
+      vehicleNumber: inspectionForm.vehicleNumber,
+    };
+    try {
+      console.log(inspectionFormResult);
+      api.post("/v1/saveInspectionReport/", inspectionFormResult);
+    } catch (e) {
+      console.log(e);
     }
-    try{
-        console.log(inspectionFormResult);
-        api.post("/v1/saveInspectionReport/", inspectionFormResult)
-        
-      
-    }catch(e){
-        console.log(e);
-    }
-  }
+  };
 
   return (
     <div>
-      <div >
+      <div>
         <h1>Inspection Form</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="operatorTagNumber">
-            Operator Tag Number
-          </label>
+          <label>Is pre or post ?</label>
+          <label>
+          <input
+            type="radio"
+            name= "isPreOrPost"
+            value="Pre"
+            onChange={handleChange}
+          />
+          Pre
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="isPreOrPost"
+            value="Post"
+            onChange={handleChange}
+          />
+          Post
+        </label>
+        </div>
+
+        <div>
+          <label htmlFor="operatorTagNumber">Operator Tag Number</label>
           <input
             type="text"
             placeholder="Operator Tag"
@@ -107,17 +127,13 @@ export const InspectionForm = () => {
           />
         </div>
 
-     
-
-
         <ul>
-          {inspectionForm.inspectionDtoList !== undefined ? (
-            inspectionForm.inspectionDtoList.map((inspection, index) => {
-                            
+          {inspectionForm.inspectionResults !== undefined ? (
+            inspectionForm.inspectionResults.map((inspection, index) => {
               return (
                 <li key={index}>
-                  <div >
-                  <div>{inspection.inspectionName}</div>
+                  <div>
+                    <div>{inspection.inspectionName}</div>
                     <label>
                       <input
                         type="radio"
@@ -133,7 +149,7 @@ export const InspectionForm = () => {
                         onChange={handleListChange}
                         name={`${inspection.inspectionName}`}
                         value="bad"
-                                              />
+                      />
                       Bad
                     </label>
                   </div>
